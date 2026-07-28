@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { playJelly } from '../audio/playJelly';
 import { BrandedLoader } from '../components/BrandedLoader';
 import { LevelButton } from '../components/LevelButton';
+import { QuizMeButton } from '../components/QuizMeButton';
 import { SpeakWordButton } from '../components/SpeakWordButton';
 import { catalogs, packsForLevel } from '../domain/catalog';
 import { ensureTodaysWord } from '../domain/ensureTodaysWord';
@@ -102,10 +103,11 @@ function levelAccent(
 
 type Props = {
   onOpenHistory: () => void;
+  onOpenQuiz: () => void;
   onShownChange: (shown: ShownYearByWordId) => void;
 };
 
-export function HomeScreen({ onOpenHistory, onShownChange }: Props) {
+export function HomeScreen({ onOpenHistory, onOpenQuiz, onShownChange }: Props) {
   const colors = useThemeColors();
   const [ready, setReady] = useState(false);
   const [level, setLevel] = useState<Level | null>(null);
@@ -150,7 +152,7 @@ export function HomeScreen({ onOpenHistory, onShownChange }: Props) {
       const savedToday = savedState?.localDate === todayStr ? savedState : null;
       const prior =
         mergeDailyStates(savedToday, nativeToday) ?? savedState ?? nativeToday;
-      // Only an explicit saved preference unlocks a day — widgets must not choose for the user.
+      // Only an explicit saved preference unlocks a day; widgets must not choose for the user.
       const preference = savedLevel;
 
       if (!preference) {
@@ -384,6 +386,8 @@ export function HomeScreen({ onOpenHistory, onShownChange }: Props) {
           <Text style={[styles.privacy, { color: colors.inkMuted }]}>
             Privacy: words and progress stay on this device. Nothing is uploaded.
           </Text>
+
+          <QuizMeButton onPress={onOpenQuiz} />
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>

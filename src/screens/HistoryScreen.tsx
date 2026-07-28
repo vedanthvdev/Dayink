@@ -93,9 +93,9 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   title: {
-    fontSize: 34,
+    fontSize: 40,
     fontFamily: fonts.display,
-    letterSpacing: -0.8,
+    letterSpacing: -1,
   },
   subtitle: {
     marginTop: 8,
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   empty: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 17,
+    lineHeight: 25,
     fontFamily: fonts.body,
   },
   row: {
@@ -116,10 +116,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   level: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: fonts.bodySemi,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
+    letterSpacing: 1.4,
   },
   word: {
     marginTop: 6,
@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
   },
   oneLiner: {
     marginTop: 6,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 17,
+    lineHeight: 25,
     fontFamily: fonts.body,
   },
 });
