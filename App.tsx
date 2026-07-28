@@ -17,7 +17,10 @@ import { BrandedLoader } from './src/components/BrandedLoader';
 import type { ShownYearByWordId } from './src/domain/shownYear';
 import { HistoryScreen } from './src/screens/HistoryScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
+import { QuizScreen } from './src/screens/QuizScreen';
 import { useIsDark } from './src/theme/useThemeColors';
+
+type AppScreen = 'home' | 'history' | 'quiz';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -28,7 +31,7 @@ export default function App() {
     SourceSans3_700Bold,
   });
   const isDark = useIsDark();
-  const [screen, setScreen] = useState<'home' | 'history'>('home');
+  const [screen, setScreen] = useState<AppScreen>('home');
   const [shownYearByWordId, setShownYearByWordId] = useState<ShownYearByWordId>({});
 
   useEffect(() => {
@@ -50,10 +53,12 @@ export default function App() {
   }
 
   const onHome = screen === 'home';
+  const onHistory = screen === 'history';
+  const onQuiz = screen === 'quiz';
 
   return (
     <SafeAreaProvider>
-      {/* Keep Home mounted so overnight refresh and in-memory state survive History. */}
+      {/* Keep Home mounted so overnight refresh and in-memory state survive History/Quiz. */}
       <View
         style={[styles.fill, onHome ? styles.visible : styles.hidden]}
         pointerEvents={onHome ? 'auto' : 'none'}
@@ -63,16 +68,29 @@ export default function App() {
         <HomeScreen
           onShownChange={setShownYearByWordId}
           onOpenHistory={() => setScreen('history')}
+          onOpenQuiz={() => setScreen('quiz')}
         />
       </View>
       <View
-        style={[styles.fill, !onHome ? styles.visible : styles.hidden]}
-        pointerEvents={!onHome ? 'auto' : 'none'}
-        accessibilityElementsHidden={onHome}
-        importantForAccessibility={!onHome ? 'yes' : 'no-hide-descendants'}
+        style={[styles.fill, onHistory ? styles.visible : styles.hidden]}
+        pointerEvents={onHistory ? 'auto' : 'none'}
+        accessibilityElementsHidden={!onHistory}
+        importantForAccessibility={onHistory ? 'yes' : 'no-hide-descendants'}
       >
         <HistoryScreen
           shownYearByWordId={shownYearByWordId}
+          onBack={() => setScreen('home')}
+        />
+      </View>
+      <View
+        style={[styles.fill, onQuiz ? styles.visible : styles.hidden]}
+        pointerEvents={onQuiz ? 'auto' : 'none'}
+        accessibilityElementsHidden={!onQuiz}
+        importantForAccessibility={onQuiz ? 'yes' : 'no-hide-descendants'}
+      >
+        <QuizScreen
+          shownYearByWordId={shownYearByWordId}
+          isActive={onQuiz}
           onBack={() => setScreen('home')}
         />
       </View>
