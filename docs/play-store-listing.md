@@ -48,7 +48,7 @@ Example sentences on today’s word, refreshed level catalogs, and pronunciation
 
 ## Privacy policy URL (required)
 
-**Privacy policy URL (live):** [https://vedanthvdev.github.io/daily-vocab/privacy-policy.html](https://vedanthvdev.github.io/daily-vocab/privacy-policy.html)
+**Privacy policy URL (live):** [https://vedanthvdev.github.io/Dayink/privacy-policy.html](https://vedanthvdev.github.io/Dayink/privacy-policy.html)
 
 Hosted via GitHub Pages from `docs/privacy-policy.html` (same as App Store). Paste this into Play Console → App content → Privacy policy.
 

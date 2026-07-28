@@ -62,14 +62,14 @@ First release of Dayink — daily vocabulary with Lock Screen widget, three leve
 **Support URL:** `mailto:chintudon123@gmail.com` is not ideal; prefer a page. Temporary: host `docs/privacy-policy.html` (same contact) or use:
 
 ```
-https://github.com/vedanthvdev/daily-vocab
+https://github.com/vedanthvdev/Dayink
 ```
 
 Better: publish `docs/privacy-policy.html` via GitHub Pages and reuse that site root as Support URL.
 
 **Marketing URL:** leave blank (optional)
 
-**Privacy Policy URL:** `https://vedanthvdev.github.io/daily-vocab/privacy-policy.html` (GitHub Pages from `docs/privacy-policy.html`).
+**Privacy Policy URL:** `https://vedanthvdev.github.io/Dayink/privacy-policy.html` (GitHub Pages from `docs/privacy-policy.html`).
 
 ## App Privacy (nutrition labels)
 

@@ -1,0 +1,49 @@
+name: Dayink quality gate
+description: Install deps, then typecheck + test + catalog validate (parallel) and widget sync.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: npm
+        cache-dependency-path: package-lock.json
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Typecheck, test, and validate catalogs
+      shell: bash
+      run: |
+        set -euo pipefail
+        npm run typecheck &
+        pid_tc=$!
+        npm test &
+        pid_test=$!
+        npm run content:validate:strict &
+        pid_content=$!
+        fail=0
+        wait "$pid_tc" || { echo "::error::typecheck failed"; fail=1; }
+        wait "$pid_test" || { echo "::error::tests failed"; fail=1; }
+        wait "$pid_content" || { echo "::error::content:validate:strict failed"; fail=1; }
+        exit "$fail"
+
+    - name: Verify widget content sync
+      shell: bash
+      run: |
+        npm run content:sync
+        git diff --exit-code -- content/words targets/DayinkWidget/assets modules/widget-bridge/android/src/main/assets/words
+
+    - name: Summary
+      if: always()
+      shell: bash
+      run: |
+        {
+          echo "## Dayink quality"
+          echo ""
+          echo "- Typecheck, Vitest, and catalog validation ran in parallel after \`npm ci\`."
+          echo "- Widget asset sync checked against the repo."
+        } >> "$GITHUB_STEP_SUMMARY"

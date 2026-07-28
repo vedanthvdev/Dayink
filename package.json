@@ -1,6 +1,6 @@
 {
-  "name": "daily-vocab",
-  "version": "3.1.0",
+  "name": "dayink",
+  "version": "3.2.0",
   "main": "index.ts",
   "dependencies": {
     "@bacons/apple-targets": "^4.0.7",
@@ -43,6 +43,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "ci:quality": "npm run typecheck && npm test && npm run content:validate:strict",
     "content:validate": "tsx content/tools/validate-catalog.ts",
     "content:generate": "tsx content/tools/generate-full-catalogs.ts",
     "content:build-beginner": "tsx content/tools/build-beginner-catalog.ts",

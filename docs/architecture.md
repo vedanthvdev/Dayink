@@ -61,5 +61,5 @@ Routes stay thin: map navigation to screen props / provider data. No quiz/home r
 
 ## Related
 
-- Issue: Quiz maintainability — https://github.com/vedanthvdev/daily-vocab/issues/26
+- Issue: Quiz maintainability — https://github.com/vedanthvdev/Dayink/issues/26
 - Design: `docs/superpowers/specs/2026-07-28-architecture-3.1-design.md`
