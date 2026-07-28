@@ -19,7 +19,7 @@ App Group ID (must match everywhere): `group.com.dayink.app`
 On a Mac with Xcode:
 
 ```bash
-cd vedanth.vasudev/code/daily-vocab
+cd /path/to/Dayink
 # optional: set your team in app.config.ts → ios.appleTeamId
 npx expo prebuild -p ios
 xed ios

@@ -1,16 +1,22 @@
 # CI / CD (TestFlight + Play internal)
 
-Automated quality checks run on every pull request. Merges to `master` also kick off production EAS builds that auto-submit to **TestFlight** (iOS) and **Play Console internal testing** (Android). Promoting a build to App Store / Play Store customers stays manual in each console.
+Dayink quality checks run on every pull request. Merges to **`master`** kick off production EAS builds that auto-submit to **TestFlight** (iOS) and **Play Console internal testing** (Android). Promoting to App Store / Play production stays manual.
 
 ## What runs where
 
 | Event | Workflow | What it does |
 | --- | --- | --- |
-| Pull request | `CI` (`.github/workflows/ci.yml`) | `typecheck`, `test`, `content:validate` |
-| Push to `master` | `CI` + `Release iOS (TestFlight)` + `Release Android (Play internal)` | Same quality gate, then EAS production build + submit per platform |
-| Manual | Either release workflow → Run workflow | Re-run that platform’s release without a new commit |
+| Pull request | `CI` (`quality` job) | Parallel `typecheck` + `test` + `content:validate:strict`, then widget asset sync |
+| Push to `master` | `Release` | Same quality gate **once**, then iOS + Android EAS production build/submit in parallel |
+| Manual | `CI` or `Release` → Run workflow | Re-run gate or release without a new commit |
 
-Release jobs start EAS with `--no-wait`. Watch build/submit progress at [expo.dev](https://expo.dev) (then App Store Connect → TestFlight or Play Console → Internal testing after submit finishes).
+Release jobs start EAS with `--no-wait`. Watch progress at [expo.dev](https://expo.dev).
+
+## Design goals
+
+- **Fast PR evidence:** one Node install, then typecheck/tests/catalogs in parallel (~seconds of CPU after `npm ci`).
+- **No triple quality on merge:** releases no longer each re-run a separate quality job; CI does not also fire on `master` push.
+- **Required check:** protect `master` and require the GitHub check **`quality`** before merge.
 
 ## One-time setup
 
@@ -28,42 +34,25 @@ Release jobs start EAS with `--no-wait`. Watch build/submit progress at [expo.de
    npx eas-cli@21.0.2 credentials
    ```
 
-   Configure App Store distribution certificates/profiles and App Store Connect API key access as prompted so non-interactive CI can build and submit for bundle id `com.dayink.app`.
+3. **Google Play credentials in EAS** — for package `com.dayink.app` (see prior Play Console notes in git history / store docs). Privacy policy: `https://vedanthvdev.github.io/Dayink/privacy-policy.html`.
 
-3. **Google Play credentials in EAS** — for package `com.dayink.app` (Play Console account: `chintudon123@gmail.com`):
+4. **GitHub secret** — repository secret `EXPO_TOKEN`.
 
-   1. Create the Play app (if missing): Play Console → Create app → **Dayink**, package **`com.dayink.app`**, free.
-   2. Set Privacy policy URL in Play Console to `https://vedanthvdev.github.io/daily-vocab/privacy-policy.html` (GitHub Pages from `docs/privacy-policy.html`).
-   3. Complete Data safety (“no data collected”), content rating, and at least two phone screenshots so internal testing can ship. See [play-store-listing.md](./play-store-listing.md).
-   4. Create a Google Cloud **service account** + JSON key; enable **Google Play Android Developer API**; invite that service account email in Play Console → Users and permissions with rights to create/manage releases and testing tracks. Guide: [expo/fyi creating-google-service-account](https://github.com/expo/fyi/blob/main/creating-google-service-account.md).
-   5. Upload the JSON into EAS:
+5. **Branch protection** — default branch is **`master`**. Require check **`quality`**.
 
-      ```bash
-      npx eas-cli@21.0.2 credentials -p android
-      ```
-
-      Choose the production profile → Google Service Account → upload the key (or Expo dashboard → Credentials → Android → `com.dayink.app`).
-   6. **First AAB bootstrap:** Play often requires one manual AAB before API submits work. After Android store-build fixes are on `master`, run a production Android build (workflow_dispatch **Release Android** or `eas build -p android --profile production`), download the `.aab`, upload it once under Internal testing in Play Console, then CI auto-submit can continue.
-
-4. **GitHub secret** — create repository secret `EXPO_TOKEN` (Expo access token with permission to build and submit). Same secret covers iOS and Android.
-
-5. **Branch protection** — protect `master` and require the GitHub check **`quality`** from the CI workflow before merge.
-
-6. **Smoke** — merge a no-op PR or run each release workflow via `workflow_dispatch`, then confirm builds on expo.dev and later in TestFlight / Play internal testing.
+6. **Smoke** — open a PR (green quality), merge to `master`, confirm EAS on expo.dev and TestFlight / Play internal.
 
 ## Day-to-day
 
 1. Open a PR and wait for green **quality**.
 2. Merge to `master`.
-3. Wait for EAS to finish build + submit (expo.dev / email).
-4. Install from TestFlight and/or Play internal testers link; smoke-test.
-5. When ready for customers: promote in App Store Connect and/or Play Console → Production (manual).
+3. Wait for EAS build + submit.
+4. Smoke on TestFlight / Play internal; promote manually when ready.
 
-Bump the user-facing `version` in `app.config.ts` when you want a new marketing version. Store **build numbers / versionCode** auto-increment via EAS (`autoIncrement`).
+Bump marketing `version` in `app.config.ts` / `package.json` for store-facing releases. Build numbers auto-increment via EAS.
 
 ## Failure notes
 
-- Missing `EXPO_TOKEN` → release job fails fast with a pointer to this doc.
-- Missing `extra.eas.projectId` or Apple / Play credentials → EAS build or submit fails on expo.dev; fix with `eas init` / `eas credentials`, then re-run the workflow.
-- First Android submit fails with “app does not exist” / API errors → finish Play app creation and the first manual AAB upload, then re-run **Release Android**.
-- Pipeline green with `--no-wait` means “EAS accepted the build request,” not “installable on TestFlight / internal testing yet.”
+- Missing `EXPO_TOKEN` → release job fails fast.
+- Missing EAS project / store credentials → fix with `eas init` / `eas credentials`, re-run **Release**.
+- Pipeline green with `--no-wait` means EAS accepted the request, not that the binary is installable yet.

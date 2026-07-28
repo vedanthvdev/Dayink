@@ -52,7 +52,7 @@ CI / TestFlight release: `docs/ci-cd.md`.
 From the **repo root**:
 
 ```bash
-cd /path/to/daily-vocab
+cd /path/to/Dayink
 npm install
 export EXPO_APPLE_TEAM_ID=XXXXXXXXXX   # 10-char Team ID from Xcode → Settings → Accounts
 npx expo prebuild -p ios

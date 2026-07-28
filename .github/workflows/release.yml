@@ -1,4 +1,5 @@
-name: Release Android (Play internal)
+# Production EAS builds after merge to master (TestFlight + Play internal).
+name: Release
 
 on:
   push:
@@ -7,15 +8,39 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: release-android-${{ github.ref }}
+  group: release-${{ github.ref }}
   cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   quality:
     name: quality
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Quality gate
+        uses: ./.github/actions/quality-gate
+
+  ios-testflight:
+    name: ios-testflight
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Require EXPO_TOKEN
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Missing GitHub Actions secret EXPO_TOKEN. See docs/ci-cd.md."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -29,14 +54,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
-        run: npm test
-
-      - name: Validate content catalogs
-        run: npm run content:validate:strict
+      - name: EAS Build + Submit (production → TestFlight)
+        run: npx eas-cli@21.0.2 build -p ios --profile production --non-interactive --auto-submit --no-wait
 
   android-internal:
     name: android-internal
@@ -46,6 +65,13 @@ jobs:
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
+      - name: Require EXPO_TOKEN
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Missing GitHub Actions secret EXPO_TOKEN. See docs/ci-cd.md."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -58,13 +84,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Require EXPO_TOKEN
-        run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "Missing GitHub Actions secret EXPO_TOKEN. See docs/ci-cd.md."
-            exit 1
-          fi
 
       - name: EAS Build + Submit (production → Play internal)
         run: npx eas-cli@21.0.2 build -p android --profile production --non-interactive --auto-submit --no-wait

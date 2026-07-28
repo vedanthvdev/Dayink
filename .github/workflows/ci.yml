@@ -1,44 +1,25 @@
+# PR quality gate — required check name is `quality` (branch protection).
 name: CI
 
 on:
   pull_request:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   quality:
     name: quality
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
-        run: npm test
-
-      - name: Validate content catalogs
-        run: npm run content:validate:strict
-
-      - name: Verify widget content sync
-        run: |
-          npm run content:sync
-          git diff --exit-code -- content/words targets/DayinkWidget/assets modules/widget-bridge/android/src/main/assets/words
+      - name: Quality gate
+        uses: ./.github/actions/quality-gate
