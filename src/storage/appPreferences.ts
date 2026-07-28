@@ -1,10 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { DailyState, Level, LockedWord } from '../domain/types';
 import type { ShownYearByWordId, YearDigit } from '../domain/shownYear';
+import type { ThemePreference } from '../theme/themes';
 
 const LEVEL_KEY = 'dayink.level';
 const STATE_KEY = 'dayink.dailyState';
 const SHOWN_KEY = 'dayink.shownYearByWordId';
+const THEME_KEY = 'dayink.themePreference';
+
+function isThemePreference(value: unknown): value is ThemePreference {
+  return value === 'system' || value === 'light' || value === 'dark';
+}
 
 function isLevel(value: unknown): value is Level {
   return value === 'beginner' || value === 'intermediate' || value === 'hard';
@@ -124,4 +130,19 @@ export async function loadShownYearByWordId(): Promise<ShownYearByWordId> {
 
 export async function saveShownYearByWordId(shown: ShownYearByWordId): Promise<void> {
   await AsyncStorage.setItem(SHOWN_KEY, JSON.stringify(shown));
+}
+
+export async function loadThemePreference(): Promise<ThemePreference | null> {
+  const raw = await AsyncStorage.getItem(THEME_KEY);
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return isThemePreference(parsed) ? parsed : null;
+  } catch {
+    return isThemePreference(raw) ? raw : null;
+  }
+}
+
+export async function saveThemePreference(preference: ThemePreference): Promise<void> {
+  await AsyncStorage.setItem(THEME_KEY, JSON.stringify(preference));
 }
