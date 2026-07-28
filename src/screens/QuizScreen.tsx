@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -7,6 +7,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ShownYearByWordId } from '../domain/shownYear';
@@ -30,6 +32,7 @@ import {
   type QuizQuestion,
   type QuizType,
 } from '../domain/quiz';
+import type { RootStackParamList } from '../navigation/types';
 import {
   appendQuizSessionSummary,
   clearQuizDayReport,
@@ -64,8 +67,6 @@ type ReviewReturnPhase = ActivePhase | 'results' | 'home';
 type Props = {
   shownYearByWordId: ShownYearByWordId;
   onBack: () => void;
-  /** When false, screen stays mounted but hidden; re-entering refreshes storage. */
-  isActive?: boolean;
 };
 
 function snapshotPaused(input: {
@@ -91,12 +92,12 @@ function snapshotPaused(input: {
   };
 }
 
-export function QuizScreen({
-  shownYearByWordId,
-  onBack,
-  isActive = true,
-}: Props) {
+export function QuizScreen({ shownYearByWordId, onBack }: Props) {
   const colors = useThemeColors();
+  const isActive = useIsFocused();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const allowLeaveRef = useRef(false);
   const [loading, setLoading] = useState(true);
   const [usage, setUsage] = useState<QuizDailyUsage | null>(null);
   const [paused, setPaused] = useState<QuizPausedSession | null>(null);
@@ -129,6 +130,7 @@ export function QuizScreen({
   }, [paused, dayReport]);
 
   const leaveToAppHome = useCallback(() => {
+    allowLeaveRef.current = true;
     setPhase('home');
     setQuizType(null);
     setLevel(null);
@@ -420,6 +422,35 @@ export function QuizScreen({
     },
     [answers],
   );
+
+  // Pause in-progress work when the native stack pops (edge swipe / Android back).
+  useEffect(() => {
+    const unsub = navigation.addListener('beforeRemove', (e) => {
+      if (allowLeaveRef.current) {
+        allowLeaveRef.current = false;
+        return;
+      }
+      if (
+        phase === 'home' ||
+        phase === 'results' ||
+        (phase === 'review' &&
+          (reviewReturnPhase === 'results' || reviewReturnPhase === 'home'))
+      ) {
+        return;
+      }
+      e.preventDefault();
+      void (async () => {
+        try {
+          await onAbandonQuiz();
+        } finally {
+          // Always complete the leave — don't leave the user stuck if persist fails.
+          allowLeaveRef.current = true;
+          navigation.dispatch(e.data.action);
+        }
+      })();
+    });
+    return unsub;
+  }, [navigation, phase, reviewReturnPhase, onAbandonQuiz]);
 
   const onSelectChoice = useCallback(
     async (index: number) => {
@@ -993,9 +1024,7 @@ export function QuizScreen({
                   >
                     <Text style={[styles.link, { color: colors.inkMuted }]}>Abandon</Text>
                   </Pressable>
-                ) : (
-                  <Text style={[styles.link, { color: colors.inkMuted }]}>Review</Text>
-                )}
+                ) : null}
               </View>
 
               {answers.length === 0 ? (
