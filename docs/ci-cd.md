@@ -8,6 +8,7 @@ Dayink quality checks run on every pull request. **Store builds do not run on me
 | --- | --- | --- | --- |
 | Pull request | `CI` (`quality` job) | Parallel `typecheck` + `test` + `content:validate:strict`, then widget asset sync | No |
 | Manual | `Release` → Run workflow | Same quality gate once, then iOS and/or Android EAS production build (optional auto-submit) | Yes |
+| Push to `master` (`docs/**`) or manual | `Deploy GitHub Pages` | Publishes `docs/` (privacy policy) via Actions | No |
 
 Release jobs start EAS with `--no-wait`. Watch progress at [expo.dev](https://expo.dev).
 
