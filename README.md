@@ -15,7 +15,7 @@ Simple Expo (React Native) app: pick **Beginner / Intermediate / Hard**, then se
 
 ## Requirements
 
-- Node 20+
+- Node 20+ (CI uses Node 24)
 - Xcode + iOS Simulator (Mac) for `npm run ios`
 - For lock-screen widgets: **dev client** / `expo prebuild` + native run. Expo Go runs the app UI; the local widget module is a safe no-op there.
 

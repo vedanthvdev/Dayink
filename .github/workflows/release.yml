@@ -1,11 +1,24 @@
-# Production EAS builds after merge to master (TestFlight + Play internal).
+# Manual store builds only — avoids burning EAS free-plan quota on every merge.
+# Run from Actions → Release → Run workflow (pick platform).
 name: Release
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
+    inputs:
+      platform:
+        description: Which store build(s) to start on EAS
+        type: choice
+        required: true
+        default: both
+        options:
+          - both
+          - ios
+          - android
+      auto_submit:
+        description: Auto-submit to TestFlight / Play internal after build
+        type: boolean
+        required: true
+        default: true
 
 concurrency:
   group: release-${{ github.ref }}
@@ -21,13 +34,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Quality gate
         uses: ./.github/actions/quality-gate
 
   ios-testflight:
     name: ios-testflight
+    if: ${{ inputs.platform == 'both' || inputs.platform == 'ios' }}
     needs: quality
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -42,23 +56,29 @@ jobs:
           fi
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
           cache: npm
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: EAS Build + Submit (production → TestFlight)
-        run: npx eas-cli@21.0.2 build -p ios --profile production --non-interactive --auto-submit --no-wait
+      - name: EAS Build (production → TestFlight)
+        run: |
+          if [ "${{ inputs.auto_submit }}" = "true" ]; then
+            npx eas-cli@21.0.2 build -p ios --profile production --non-interactive --auto-submit --no-wait
+          else
+            npx eas-cli@21.0.2 build -p ios --profile production --non-interactive --no-wait
+          fi
 
   android-internal:
     name: android-internal
+    if: ${{ inputs.platform == 'both' || inputs.platform == 'android' }}
     needs: quality
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -73,17 +93,22 @@ jobs:
           fi
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
           cache: npm
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: EAS Build + Submit (production → Play internal)
-        run: npx eas-cli@21.0.2 build -p android --profile production --non-interactive --auto-submit --no-wait
+      - name: EAS Build (production → Play internal)
+        run: |
+          if [ "${{ inputs.auto_submit }}" = "true" ]; then
+            npx eas-cli@21.0.2 build -p android --profile production --non-interactive --auto-submit --no-wait
+          else
+            npx eas-cli@21.0.2 build -p android --profile production --non-interactive --no-wait
+          fi

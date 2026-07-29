@@ -2,7 +2,7 @@
 
 Use these values in Google Play Console for package `com.dayink.app` (developer account `chintudon123@gmail.com`).
 
-CI auto-submits production AABs to the **internal testing** track on every `master` merge. Promoting to **Production** stays manual in Play Console. See [ci-cd.md](./ci-cd.md).
+CI can submit production AABs to the **internal testing** track when you manually run the **Release** workflow (Android). Promoting to **Production** stays manual in Play Console. See [ci-cd.md](./ci-cd.md).
 
 ## App details
 
@@ -100,7 +100,7 @@ Logged in as **chintudon123@gmail.com**:
 2. Set privacy policy URL, Data safety, content rating, and phone screenshots.
 3. Create a Google Cloud service account JSON key, enable **Google Play Android Developer API**, invite the service account in Play Console with release/testing permissions, upload the key to EAS (`eas credentials -p android`). Details: [Expo service-account guide](https://github.com/expo/fyi/blob/main/creating-google-service-account.md).
 4. Upload the **first** production `.aab` manually to Internal testing (Play often requires this before API submits).
-5. Confirm GitHub secret `EXPO_TOKEN` exists; thereafter every `master` merge runs **Release Android (Play internal)** and auto-submits to the internal track.
+5. Confirm GitHub secret `EXPO_TOKEN` exists; thereafter run **Actions → Release** manually when you want an Android internal build (see [ci-cd.md](./ci-cd.md)).
 6. When ready for the public: Play Console → promote the internal release → **Production**.
 
 ## Review notes (for Play if asked)
