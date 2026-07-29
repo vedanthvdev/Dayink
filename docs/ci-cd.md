@@ -8,6 +8,7 @@ Dayink quality checks run on every pull request. **Store builds do not run on me
 | --- | --- | --- | --- |
 | Pull request | `CI` (`quality` job) | Parallel `typecheck` + `test` + `content:validate:strict`, then widget asset sync | No |
 | Manual | `Release` → Run workflow | Same quality gate once, then iOS and/or Android EAS production build (optional auto-submit) | Yes |
+| Push to `master` (`docs/privacy-policy.html`) or manual | `Deploy GitHub Pages` | Publishes privacy policy via Actions (Node 24-era actions) | No |
 
 Release jobs start EAS with `--no-wait`. Watch progress at [expo.dev](https://expo.dev).
 
@@ -85,7 +86,9 @@ Free Expo plans give a small monthly pool of cloud builds (especially iOS). Prac
 
 5. **Branch protection** — default branch is **`master`**. Require check **`quality`**.
 
-6. **Smoke** — open a PR (green quality), merge, then manually run **Release** (`android` first with `auto_submit` once the key is uploaded).
+6. **GitHub Pages** — Settings → Pages → Source = **GitHub Actions** (not “Deploy from a branch”). That stops the legacy `pages-build-deployment` Node 20 warning. Privacy URL: `https://vedanthvdev.github.io/Dayink/privacy-policy.html`.
+
+7. **Smoke** — open a PR (green quality), merge, then manually run **Release** (`android` first with `auto_submit` once the key is uploaded).
 
 ## Day-to-day
 

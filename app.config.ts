@@ -12,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'Dayink',
   slug: 'dayink',
   owner: 'chintuvedanth',
-  version: '3.2.1',
+  version: '3.2.2',
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
