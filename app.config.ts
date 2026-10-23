@@ -53,8 +53,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     'expo-asset',
     '@bacons/apple-targets',
-    // iOS 27 SDK requires UIScene lifecycle or the app traps at launch.
-    './plugins/withIosSceneLifecycle.js',
     './plugins/withAndroidComposeCompiler.js',
   ],
   extra: {

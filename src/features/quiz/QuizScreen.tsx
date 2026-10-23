@@ -1,6 +1,7 @@
-import { ActivityIndicator, ScrollView } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScreenScroll } from '../../components/ScreenScroll';
 import type { ShownYearByWordId } from '../../domain/shownYear';
 import { useThemeColors } from '../../theme/useThemeColors';
 import { QuizHomeView } from './components/QuizHomeView';
@@ -22,7 +23,7 @@ export function QuizScreen({ shownYearByWordId, onBack }: Props) {
   if (session.loading) {
     return (
       <LinearGradient colors={colors.gradient} style={styles.gradient}>
-        <SafeAreaView style={[styles.safe, styles.centered]}>
+        <SafeAreaView edges={['top', 'right', 'bottom', 'left']} style={[styles.safe, styles.centered]}>
           <ActivityIndicator color={colors.ink} />
         </SafeAreaView>
       </LinearGradient>
@@ -36,12 +37,7 @@ export function QuizScreen({ shownYearByWordId, onBack }: Props) {
       end={{ x: 0.95, y: 1 }}
       style={styles.gradient}
     >
-      <SafeAreaView style={styles.safe}>
-        <ScrollView
-          contentContainerStyle={styles.inner}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+      <ScreenScroll style={styles.inner} keyboardShouldPersistTaps="handled">
           {session.phase === 'home' ? (
             <QuizHomeView
               quizLockedForToday={session.quizLockedForToday}
@@ -101,8 +97,7 @@ export function QuizScreen({ shownYearByWordId, onBack }: Props) {
               onLeaveToAppHome={session.leaveToAppHome}
             />
           ) : null}
-        </ScrollView>
-      </SafeAreaView>
+      </ScreenScroll>
     </LinearGradient>
   );
 }
