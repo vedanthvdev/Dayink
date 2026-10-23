@@ -1,6 +1,6 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScreenScroll } from '../../components/ScreenScroll';
 import { catalogs } from '../../domain/catalog';
 import { historyForCurrentYear, type ShownYearByWordId } from '../../domain/shownYear';
 import type { Level } from '../../domain/types';
@@ -30,11 +30,7 @@ export function HistoryScreen({ shownYearByWordId, onBack }: Props) {
       end={{ x: 0.95, y: 1 }}
       style={styles.gradient}
     >
-      <SafeAreaView style={styles.safe}>
-        <ScrollView
-          contentContainerStyle={styles.inner}
-          showsVerticalScrollIndicator={false}
-        >
+      <ScreenScroll style={styles.inner}>
           <Pressable
             onPress={onBack}
             hitSlop={12}
@@ -72,15 +68,13 @@ export function HistoryScreen({ shownYearByWordId, onBack }: Props) {
               </View>
             ))
           )}
-        </ScrollView>
-      </SafeAreaView>
+      </ScreenScroll>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   gradient: { flex: 1 },
-  safe: { flex: 1, backgroundColor: 'transparent' },
   inner: {
     flexGrow: 1,
     paddingHorizontal: 22,

@@ -1,7 +1,7 @@
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { BrandedLoader } from '../../components/BrandedLoader';
+import { ScreenScroll } from '../../components/ScreenScroll';
 import { LevelButton } from '../../components/LevelButton';
 import { QuizMeButton } from '../../components/QuizMeButton';
 import { SpeakWordButton } from '../../components/SpeakWordButton';
@@ -40,12 +40,7 @@ export function HomeScreen({ onOpenHistory, onOpenQuiz, onShownChange }: Props) 
       end={{ x: 0.95, y: 1 }}
       style={styles.gradient}
     >
-      <SafeAreaView style={styles.safe}>
-        <ScrollView
-          contentContainerStyle={styles.inner}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+      <ScreenScroll style={styles.inner} keyboardShouldPersistTaps="handled">
           <View style={styles.topRow}>
             <Text style={[styles.brand, { color: colors.ink }]}>Dayink</Text>
             <Pressable
@@ -121,8 +116,7 @@ export function HomeScreen({ onOpenHistory, onOpenQuiz, onShownChange }: Props) 
           </Text>
 
           <QuizMeButton onPress={onOpenQuiz} />
-        </ScrollView>
-      </SafeAreaView>
+      </ScreenScroll>
     </LinearGradient>
   );
 }
@@ -130,10 +124,6 @@ export function HomeScreen({ onOpenHistory, onOpenQuiz, onShownChange }: Props) 
 const styles = StyleSheet.create({
   gradient: {
     flex: 1,
-  },
-  safe: {
-    flex: 1,
-    backgroundColor: 'transparent',
   },
   inner: {
     flexGrow: 1,

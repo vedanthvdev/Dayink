@@ -8,6 +8,7 @@
       "distribution": "store",
       "autoIncrement": true,
       "ios": {
+        "image": "sdk-58",
         "resourceClass": "m-medium"
       }
     }

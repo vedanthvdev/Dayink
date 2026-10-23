@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { fonts } from '../theme/typography';
 import { useThemeColors } from '../theme/useThemeColors';
 
@@ -35,19 +36,24 @@ export function BrandedLoader() {
       end={{ x: 0.9, y: 1 }}
       style={styles.root}
     >
-      <Text style={[styles.brand, { color: colors.ink }]}>Dayink</Text>
-      <Text style={[styles.caption, { color: colors.inkMuted }]}>
-        Loading today’s word…
-      </Text>
-      <Animated.View
-        style={[styles.dot, { backgroundColor: colors.ink }, dotStyle]}
-      />
+      <SafeAreaView edges={['top', 'right', 'bottom', 'left']} style={styles.safe}>
+        <Text style={[styles.brand, { color: colors.ink }]}>Dayink</Text>
+        <Text style={[styles.caption, { color: colors.inkMuted }]}>
+          Loading today’s word…
+        </Text>
+        <Animated.View
+          style={[styles.dot, { backgroundColor: colors.ink }, dotStyle]}
+        />
+      </SafeAreaView>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+  },
+  safe: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
